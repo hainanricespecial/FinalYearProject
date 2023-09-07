@@ -1,4 +1,4 @@
-This project is a word game based on Shiritori, a word chain game originated in Japan.
+This final year project is a word game based on Shiritori, a word chain game originated in Japan.
 
 This project is also written in React Native and uses the Expo framework for the development.
 Due to incompabilities with packages used for this project and Expo Snack, this project is 
