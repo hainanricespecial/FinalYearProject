@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, Button, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, Button, TouchableOpacity, Alert, FlatList, ScrollView, SectionList } from 'react-native';
 import React, { useState, setState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
@@ -47,6 +47,12 @@ export default function App() {
 
   // States to contain all words that has been used while opening this game.
   const [wordHistoryList, setWordHistoryList] = useState([]);
+
+  // States for checking if function still loads or not.
+  const [isLoading, setLoading] = useState(true);
+
+  // State to contain the JSON retrieved from the API.
+  const [wordDefinition, setWordDefinition] = useState([]);
 
   // States for sound effects.
   const [sound, setSound] = useState();
@@ -604,14 +610,12 @@ export default function App() {
               playErrorSound();
 
               // Reduce the player's life by one if they're not on casual mode.
-              if (isCasualMode == false) 
-              {
+              if (isCasualMode == false) {
                 lifeCheck();
               }
 
             }
-            else 
-            {
+            else {
 
               checkLetter(inputWord);
 
@@ -627,6 +631,28 @@ export default function App() {
       </View>
 
     )
+  }
+
+  // Function to fetch the definition of words via Dictionary API
+  const fetchWordDefinition = async (word) => {
+
+    let word_query = word;
+    url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word_query}`;
+
+    try {
+      const response = await fetch(url);
+      const wordDefinitionJSON = await response.json();
+
+      setWordDefinition(wordDefinitionJSON);
+
+    }
+    catch (error) {
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+    }
+
   }
 
   // Screen for home screen.
@@ -959,7 +985,6 @@ export default function App() {
 
   }
 
-
   // Screen for game over.
   function GameOverScreen() {
 
@@ -1044,9 +1069,27 @@ export default function App() {
     )
   }
 
-  // Component for word entries in word history list....??????????
+  // Component for words in the word history list.
+  function Word({ item }) {
 
-  // Screen for word definition.
+    // Create a navigation hook.
+    const navigation = useNavigation();
+
+    return (
+      <View style={styles.wordHistoryContainer}>
+
+        <TouchableOpacity onPress={() => {
+          fetchWordDefinition(item.word);
+          navigation.navigate('WordDefinition', { text: item.word });
+        }}
+          style={styles.wordHistoryButton}>
+          <Text style={styles.wordHistoryText}>{item.word}</Text>
+        </TouchableOpacity>
+
+      </View>
+    )
+
+  }
 
   // Screen for word history and look up feature.
   function WordHistoryScreen() {
@@ -1061,22 +1104,88 @@ export default function App() {
         <View>
           <Text>Word History!</Text>
 
+          <Button onPress={() => {
+
+            navigation.navigate('Home');
+
+          }} title='Return'></Button>
+
           <FlatList
+            style={{ height: '90%', margin: 6 }}
             data={wordHistoryList}
-            renderItem={({ item }) => <Text>{item.word}</Text>}
+            renderItem={({ item }) => <Word item={item} />}
           />
         </View>
-
-        <Button onPress={() => {
-
-          navigation.navigate('Home');
-
-        }} title='Return'></Button>
-
 
       </SafeAreaView>
 
     )
+  }
+
+  // Screen for word definition.
+  function WordDefinitionScreen({ route }) {
+
+    // Create a navigation hook.
+    const navigation = useNavigation();
+
+    // Get the word
+    const { text } = route.params;
+
+    return (
+      <SafeAreaView>
+
+        <Button onPress={() => {
+
+          navigation.navigate('WordHistory');
+
+        }} title='Return to Word History'></Button>
+
+        <Text>Definition</Text>
+        <Text>{text}</Text>
+
+        {isLoading ? (
+          <ActivityIndicator />
+        ) : (
+
+          <FlatList
+            data={wordDefinition}
+            renderItem={({ item }) => (
+              <View>
+
+                <Text>{item.phonetic + '\n'}</Text>
+
+                {/* Loop through the part of speeches. */}
+                <FlatList
+                  data={item.meanings}
+                  renderItem={({ item }) => (
+                    <View>
+
+                       <Text>{item.partOfSpeech}</Text>
+
+                       {/* Get the definition after rendering the part of speech the word is used. */}
+                        <FlatList 
+                         data={item.definitions}
+                         renderItem={({item}) => (
+                          <Text>{item.definition}</Text>
+                         )}
+                        />
+
+                    </View>
+                   
+                  )}
+                />
+
+              </View>
+
+            )
+            }
+          />
+
+        )}
+
+      </SafeAreaView>
+    )
+
   }
 
   // Display the home screen and loads the necessary screen for the application.
@@ -1090,6 +1199,7 @@ export default function App() {
         <Stack.Screen name="ChallengeMode" component={ChallengeModeScreen} />
         <Stack.Screen name="GameOver" component={GameOverScreen} />
         <Stack.Screen name="WordHistory" component={WordHistoryScreen} />
+        <Stack.Screen name="WordDefinition" component={WordDefinitionScreen} />
       </Stack.Navigator>
     </NavigationContainer>
 
@@ -1123,6 +1233,26 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 50,
 
+  },
+
+  wordHistoryContainer:
+  {
+    alignItems: 'center'
+  },
+
+  wordHistoryButton:
+  {
+    alignItems: 'center',
+    backgroundColor: '#DDDDDD',
+    padding: 10,
+    marginBottom: 10,
+    width: '80%',
+  },
+
+  wordHistoryText:
+  {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   virtualKeyboardButton: {
