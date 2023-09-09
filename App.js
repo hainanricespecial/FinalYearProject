@@ -4,7 +4,7 @@ import React, { useState, setState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import wordList from './assets/json/wordlist.json';
 
@@ -77,11 +77,115 @@ export default function App() {
   // Create an input Ref
   const inputRef = useRef(null);
 
+  // Load the high scores stored in the AsyncStorage. 
+  async function getHighScoreFromAsync ()
+  {
+
+    try
+    {
+      const highScoreValue = await AsyncStorage.getItem('highScore');
+      const challengeHighScoreValue = await AsyncStorage.getItem('challengeHighScore');
+
+      if (highScoreValue !== null)
+      {
+          setHighScore(highScoreValue);
+      }
+
+      if (challengeHighScoreValue !== null)
+      {
+          setChallengeHighScore(challengeHighScoreValue);
+      }
+
+
+    }
+
+    catch(error)
+    {
+      console.log('Error occurred while loading data: ', error);
+    }
+
+  }
+
+  // Save the high score into AsyncStorage.
+  const storeHighScore = async (value) =>
+  {
+
+    switch(currentGameMode)
+    {
+      case 'Score':
+        try
+        {
+          await AsyncStorage.setItem('highScore', value);
+        }
+        catch (error)
+        {
+          Alert('There was an error while saving the high score: ' + error);
+        }
+
+      case 'Challenge':
+        try
+        {
+          await AsyncStorage.setItem('challengeHighScore', value);
+        }
+        catch (error)
+        {
+          Alert('There was an error while saving the high score: ' + error);
+        }
+
+    }
+
+  }
+
+  // Load the word history list stored in the AsyncStorage.
+  async function getWordHistoryListFromAsync ()
+  {
+
+    try
+    {
+      const wordHistoryListRetrieved = await AsyncStorage.getItem('wordHistoryList');
+
+      if (wordHistoryListRetrieved !== null)
+      {
+
+          const JSONValue = JSON.parse(wordHistoryListRetrieved);
+          setWordHistoryList(JSONValue);
+          
+      }
+
+    }
+
+    catch(error)
+    {
+      console.log('Error occurred while loading data: ', error);
+    }
+
+  }
+
+  // Save the word history list into the AsyncStorage.
+  const storeWordHistoryList = async (value) =>
+  {
+    try
+    {
+      console.log(value);
+      const JSONList = JSON.stringify(value);
+      await AsyncStorage.setItem('wordHistoryList', JSONList);
+    }
+
+    catch
+    {
+      Alert('There was an error while updating the word list: ' + error);
+    }
+
+  }
+
   // Randomize the starting word prompts for all modes.
   useEffect(() => {
     casualWord == setCasualWord(wordList.words[Math.floor(Math.random() * wordList.words.length)]);
     scoreModeWord == setScoreModeWord(wordList.words[Math.floor(Math.random() * wordList.words.length)]);
     challengeModeWord == setChallengeModeWord(wordList.words[Math.floor(Math.random() * wordList.words.length)]);
+
+    getHighScoreFromAsync();
+    getWordHistoryListFromAsync();
   }, []);
 
   // Play a sound for valid words.
@@ -297,6 +401,9 @@ export default function App() {
 
                 else {
                   setWordHistoryList([...wordHistoryList, { word: input_word.toLowerCase() }]);
+
+                  // Save the word history list to AsyncStorage.
+                  storeWordHistoryList(wordHistoryList);
                 }
                 break;
 
@@ -312,6 +419,9 @@ export default function App() {
 
                 else {
                   setWordHistoryList([...wordHistoryList, { word: input_word.toLowerCase() }]);
+
+                  // Save the word history list to AsyncStorage.
+                  storeWordHistoryList(wordHistoryList);
                 }
 
                 break;
@@ -331,6 +441,9 @@ export default function App() {
 
                 else {
                   setWordHistoryList([...wordHistoryList, { word: input_word.toLowerCase() }]);
+
+                  // Save the word history list to AsyncStorage.
+                  storeWordHistoryList(wordHistoryList);
                 }
 
                 break;
@@ -1032,10 +1145,12 @@ export default function App() {
         switch (currentGameMode) {
           case 'Score':
             setHighScore(displayScoreResults);
+            storeHighScore(displayScoreResults.toString());
             break;
 
           case 'Challenge':
             setChallengeHighScore(displayScoreResults);
+            storeHighScore(displayScoreResults.toString());
             break;
         }
 
@@ -1043,8 +1158,6 @@ export default function App() {
       }
 
     }, [])
-
-
 
     return (
       <SafeAreaView style={styles.container}>
