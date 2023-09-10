@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, Button, TouchableOpacity, Alert, FlatList, ScrollView, SectionList } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, Button, TouchableOpacity, Alert, FlatList, ScrollView, SectionList, Pressable } from 'react-native';
 import React, { useState, setState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
@@ -78,57 +78,46 @@ export default function App() {
   const inputRef = useRef(null);
 
   // Load the high scores stored in the AsyncStorage. 
-  async function getHighScoreFromAsync ()
-  {
+  async function getHighScoreFromAsync() {
 
-    try
-    {
+    try {
       const highScoreValue = await AsyncStorage.getItem('highScore');
       const challengeHighScoreValue = await AsyncStorage.getItem('challengeHighScore');
 
-      if (highScoreValue !== null)
-      {
-          setHighScore(highScoreValue);
+      if (highScoreValue !== null) {
+        setHighScore(highScoreValue);
       }
 
-      if (challengeHighScoreValue !== null)
-      {
-          setChallengeHighScore(challengeHighScoreValue);
+      if (challengeHighScoreValue !== null) {
+        setChallengeHighScore(challengeHighScoreValue);
       }
 
 
     }
 
-    catch(error)
-    {
+    catch (error) {
       console.log('Error occurred while loading data: ', error);
     }
 
   }
 
   // Save the high score into AsyncStorage.
-  const storeHighScore = async (value) =>
-  {
+  const storeHighScore = async (value) => {
 
-    switch(currentGameMode)
-    {
+    switch (currentGameMode) {
       case 'Score':
-        try
-        {
+        try {
           await AsyncStorage.setItem('highScore', value);
         }
-        catch (error)
-        {
+        catch (error) {
           Alert('There was an error while saving the high score: ' + error);
         }
 
       case 'Challenge':
-        try
-        {
+        try {
           await AsyncStorage.setItem('challengeHighScore', value);
         }
-        catch (error)
-        {
+        catch (error) {
           Alert('There was an error while saving the high score: ' + error);
         }
 
@@ -137,35 +126,29 @@ export default function App() {
   }
 
   // Load the word history list stored in the AsyncStorage.
-  async function getWordHistoryListFromAsync ()
-  {
+  async function getWordHistoryListFromAsync() {
 
-    try
-    {
+    try {
       const wordHistoryListRetrieved = await AsyncStorage.getItem('wordHistoryList');
 
-      if (wordHistoryListRetrieved !== null)
-      {
+      if (wordHistoryListRetrieved !== null) {
 
-          const JSONValue = JSON.parse(wordHistoryListRetrieved);
-          setWordHistoryList(JSONValue);
-          
+        const JSONValue = JSON.parse(wordHistoryListRetrieved);
+        setWordHistoryList(JSONValue);
+
       }
 
     }
 
-    catch(error)
-    {
+    catch (error) {
       console.log('Error occurred while loading data: ', error);
     }
 
   }
 
   // Save the word history list into the AsyncStorage.
-  const storeWordHistoryList = async (value) =>
-  {
-    try
-    {
+  const storeWordHistoryList = async (value) => {
+    try {
       console.log(value);
       const JSONList = JSON.stringify(value);
       await AsyncStorage.setItem('wordHistoryList', JSONList);
@@ -775,160 +758,185 @@ export default function App() {
     const navigation = useNavigation();
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView>
+
         <View>
+
           <View style={styles.homeScreenTitleContainer}>
             <Text style={styles.homeScreenTitleText}>Connected by Letters</Text>
           </View>
 
           {/* Button to redirect to the casual mode of the game. */}
-          <TouchableOpacity onPress={() => {
-            //Set the current game mode.
-            setCurrentGameMode('Casual');
+          <View style={{ backgroundColor: '#b4b4b4', padding: 5, marginBottom: 5 }}>
+            <TouchableOpacity onPress={() => {
+              //Set the current game mode.
+              setCurrentGameMode('Casual');
 
-            // Disable the life system.
-            setIsCasualMode(true);
+              // Disable the life system.
+              setIsCasualMode(true);
 
-            // Redirect to the game.
-            navigation.navigate('CasualMode');
+              // Redirect to the game.
+              navigation.navigate('CasualMode');
 
-          }}
-            style={styles.homeScreenModeButton}>
-            <Text style={styles.homeScreenModeText}>Casual Mode</Text>
-          </TouchableOpacity>
-          <Text>Practice your word chains! Reset to your liking.</Text>
+            }}
+              style={styles.homeScreenModeButton}>
+              <Text style={styles.homeScreenModeText}>Casual Mode</Text>
+              <Text style={styles.homeScreenModeSubtitle}>Practice your word chains! Reset to your liking.</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Button to redirect to the score mode of the game. */}
-          <TouchableOpacity onPress={() => {
+          <View style={{ backgroundColor: '#1f1f1f', padding: 5, marginBottom: 5 }}>
 
-            // Check if a game is currently in progress.
-            if (scoreModeGameStarted == true) {
-              Alert.alert('Warning!', 'Do you wish to create a new game or continue the game?', [
+            <TouchableOpacity onPress={() => {
 
-                {
-                  text: 'Continue game',
-                  onPress: () => {
+              // Check if a game is currently in progress.
+              if (scoreModeGameStarted == true) {
+                Alert.alert('Warning!', 'Do you wish to create a new game or continue the game?', [
 
-                    //Set the current game mode and use the life system.
-                    setCurrentGameMode('Score');
-                    setIsCasualMode(false);
-                    navigation.navigate('ScoreMode');
+                  {
+                    text: 'Continue game',
+                    onPress: () => {
 
+                      //Set the current game mode and use the life system.
+                      setCurrentGameMode('Score');
+                      setIsCasualMode(false);
+                      navigation.navigate('ScoreMode');
+
+                    }
+                  },
+
+                  {
+                    text: 'Reset game',
+                    onPress: () => {
+
+                      newGamePreparation();
+
+                      // Allow the game to use life system.
+                      setIsCasualMode(false);
+
+                      // Redirect to the game and set the current game mode.
+                      setCurrentGameMode('Score');
+                      //setIsCasualMode(false);
+                      navigation.navigate('ScoreMode');
+
+                    }
                   }
-                },
 
-                {
-                  text: 'Reset game',
-                  onPress: () => {
+                ])
+              }
 
-                    newGamePreparation();
+              else {
 
-                    // Allow the game to use life system.
-                    setIsCasualMode(false);
+                // Redirect to the game.
+                setCurrentGameMode('Score');
+                setScoreModeGameStarted(true);
+                setIsCasualMode(false);
+                navigation.navigate('ScoreMode');
 
-                    // Redirect to the game and set the current game mode.
-                    setCurrentGameMode('Score');
-                    //setIsCasualMode(false);
-                    navigation.navigate('ScoreMode');
+              }
 
-                  }
-                }
+            }}
+              style={styles.homeScreenModeButton}>
+              <Text style={styles.homeScreenModeText}>Score Mode</Text>
+              <Text style={styles.homeScreenModeSubtitle}>Best Score: {highScore}</Text>
+            </TouchableOpacity>
 
-              ])
-            }
-
-            else {
-
-              // Redirect to the game.
-              setCurrentGameMode('Score');
-              setScoreModeGameStarted(true);
-              setIsCasualMode(false);
-              navigation.navigate('ScoreMode');
-
-            }
-
-          }}
-            style={styles.homeScreenModeButton}>
-            <Text style={styles.homeScreenModeText}>Score Mode</Text>
-          </TouchableOpacity>
-          <Text>Best Score: {highScore}</Text>
+          </View>
 
           {/* Button to redirect to the challenge mode of the game. */}
-          <TouchableOpacity onPress={() => {
+          <View style={{ backgroundColor: '#ccc', padding: 5, marginBottom: 5 }}>
 
-            // Check if a game is currently in progress.
-            if (challengeModeGameStarted == true) {
-              Alert.alert('Warning!', 'Do you wish to create a new game or continue the game?', [
+            <TouchableOpacity onPress={() => {
 
-                {
-                  text: 'Continue game',
-                  onPress: () => {
+              // Check if a game is currently in progress.
+              if (challengeModeGameStarted == true) {
+                Alert.alert('Warning!', 'Do you wish to create a new game or continue the game?', [
 
-                    //Set the current game mode and use the life system.
-                    setCurrentGameMode('Challenge');
-                    setIsCasualMode(false);
-                    navigation.navigate('ChallengeMode');
+                  {
+                    text: 'Continue game',
+                    onPress: () => {
 
+                      //Set the current game mode and use the life system.
+                      setCurrentGameMode('Challenge');
+                      setIsCasualMode(false);
+                      navigation.navigate('ChallengeMode');
+
+                    }
+                  },
+
+                  {
+                    text: 'Reset game',
+                    onPress: () => {
+
+                      newGamePreparation();
+
+                      // Allow the game to use life system.
+                      setIsCasualMode(false);
+
+                      // Re-randomize the minimum length.
+                      setMinimumLength(Math.floor(3 + Math.random() * 3));
+
+                      // Redirect to the game and set the current game mode.
+                      setCurrentGameMode('Challenge');
+                      setIsCasualMode(false);
+                      navigation.navigate('ChallengeMode');
+
+                    }
                   }
-                },
 
-                {
-                  text: 'Reset game',
-                  onPress: () => {
+                ])
+              }
 
-                    newGamePreparation();
+              else {
 
-                    // Allow the game to use life system.
-                    setIsCasualMode(false);
+                // Redirect to the game.
+                setCurrentGameMode('Challenge');
+                setChallengeModeGameStarted(true);
+                setIsCasualMode(false);
 
-                    // Re-randomize the minimum length.
-                    setMinimumLength(Math.floor(3 + Math.random() * 3));
+                // Randomize the minimum length of word.
+                setMinimumLength(Math.floor(3 + Math.random() * 3));
 
-                    // Redirect to the game and set the current game mode.
-                    setCurrentGameMode('Challenge');
-                    setIsCasualMode(false);
-                    navigation.navigate('ChallengeMode');
+                navigation.navigate('ChallengeMode');
 
-                  }
-                }
+              }
 
-              ])
-            }
+            }}
+              style={styles.homeScreenModeButton}>
+              <Text style={styles.homeScreenModeText}>Challenge Mode</Text>
+              <Text style={styles.homeScreenModeSubtitle}>Best Score: {challengeHighScore}</Text>
+            </TouchableOpacity>
 
-            else {
-
-              // Redirect to the game.
-              setCurrentGameMode('Challenge');
-              setChallengeModeGameStarted(true);
-              setIsCasualMode(false);
-
-              // Randomize the minimum length of word.
-              setMinimumLength(Math.floor(3 + Math.random() * 3));
-
-              navigation.navigate('ChallengeMode');
-
-            }
-
-          }}
-            style={styles.homeScreenModeButton}>
-            <Text style={styles.homeScreenModeText}>Challenge Mode</Text>
-          </TouchableOpacity>
-          <Text>Best Score: {challengeHighScore}</Text>
+          </View>
 
           {/* Button to redirect to the game instruction screen. */}
-          <TouchableOpacity onPress={() => alert('Coming soon!')} style={styles.homeScreenModeButton}>
-            <Text style={styles.homeScreenModeText}>How to Play</Text>
-          </TouchableOpacity>
+          <View style={{ backgroundColor: '#bbb', padding: 5, marginBottom: 5 }}>
+
+            <TouchableOpacity onPress={() => alert('Coming soon!')} style={styles.homeScreenModeButton}>
+              <Text style={styles.homeScreenModeText}>How to Play</Text>
+              <Text style={styles.homeScreenModeSubtitle}>Learn how to play the game!</Text>
+            </TouchableOpacity>
+
+          </View>
 
           {/* Button to redirect to the history of word used by the user. */}
-          <TouchableOpacity onPress={() => {
+          <View style={{ backgroundColor: '#a1bbd7', padding: 5, marginBottom: 5 }}>
 
-            navigation.navigate("WordHistory");
+            <TouchableOpacity onPress={() => {
 
-          }}
-            style={styles.homeScreenModeButton}>
-            <Text style={styles.homeScreenModeText}>Word History</Text>
-          </TouchableOpacity>
+              navigation.navigate("WordHistory");
+
+            }}
+              style={styles.homeScreenModeButton}>
+              <Text style={styles.homeScreenModeText}>Word History</Text>
+              <Text style={styles.homeScreenModeSubtitle}>See words you use and learn what they mean.</Text>
+            </TouchableOpacity>
+            
+          </View>
+
+
+          <StatusBar style="auto" />
 
         </View>
       </SafeAreaView>
@@ -951,12 +959,16 @@ export default function App() {
           <Button onPress={() => { navigation.navigate('Home') }} title='Return'></Button>
         </View>
 
+        {/* Reset button. */}
+        <Text>Reset</Text>
+
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
 
           <Text style={styles.wordPrompt}>{casualWord}</Text>
 
         </View>
+
 
         {/* Error text display for the users. */}
         {usedWordFlag == true &&
@@ -1008,7 +1020,7 @@ export default function App() {
 
         </View>
 
-        <Text>{lives}</Text>
+        <Text>Chances left: {lives}</Text>
 
         {/* Error text display for the users. */}
         {usedWordFlag == true &&
@@ -1061,7 +1073,7 @@ export default function App() {
 
         </View>
 
-        <Text>{challengeLives}</Text>
+        <Text>Chances left: {challengeLives}</Text>
 
         {/* Error text display for the users. */}
         {usedWordFlag == true &&
@@ -1212,19 +1224,23 @@ export default function App() {
 
     return (
 
-      <SafeAreaView>
+      <SafeAreaView style={styles.historyListContainer}>
+
+        <Pressable style={styles.wordDefinitionReturnButton}
+          onPress={() => {
+            setWordDefinition([]);
+            navigation.navigate('Home');
+          }}>
+
+          <Text style={styles.wordDefinitionReturnButtonText}>Return to Home</Text>
+
+        </Pressable>
+
+        <Text style={styles.historyListHeaderText}>Word History</Text>
 
         <View>
-          <Text>Word History!</Text>
-
-          <Button onPress={() => {
-
-            navigation.navigate('Home');
-
-          }} title='Return'></Button>
 
           <FlatList
-            style={{ height: '90%', margin: 6 }}
             data={wordHistoryList}
             renderItem={({ item }) => <Word item={item} />}
           />
@@ -1245,27 +1261,34 @@ export default function App() {
     const { text } = route.params;
 
     return (
-      <SafeAreaView>
+      <SafeAreaView style={styles.wordDefinitionContainer}>
 
-        <Button onPress={() => {
+        <Pressable style={styles.wordDefinitionReturnButton}
+          onPress={() => {
+            setWordDefinition([]);
+            navigation.navigate('WordHistory');
+          }}>
 
-          navigation.navigate('WordHistory');
+          <Text style={styles.wordDefinitionReturnButtonText}>Return to Word History</Text>
 
-        }} title='Return to Word History'></Button>
+        </Pressable>
 
-        <Text>Definition</Text>
-        <Text>{text}</Text>
+        <View style={styles.wordDefinitionTitleContainer}>
+          <Text style={styles.wordDefinitionHeaderText}>{text}</Text>
+        </View>
+
 
         {isLoading ? (
           <ActivityIndicator />
         ) : (
 
           <FlatList
+            style={styles.wordDefinitionDetailsContainer}
             data={wordDefinition}
             renderItem={({ item }) => (
               <View>
 
-                <Text>{item.phonetic + '\n'}</Text>
+                <Text style={styles.wordHistoryHeaderText}>{item.phonetic + '\n'}</Text>
 
                 {/* Loop through the part of speeches. */}
                 <FlatList
@@ -1273,20 +1296,22 @@ export default function App() {
                   renderItem={({ item }) => (
                     <View>
 
-                       <Text>{item.partOfSpeech}</Text>
+                      <Text style={styles.wordHistoryHeaderText}>{item.partOfSpeech}</Text>
 
-                       {/* Get the definition after rendering the part of speech the word is used. */}
-                        <FlatList 
-                         data={item.definitions}
-                         renderItem={({item}) => (
-                          <Text>{item.definition}</Text>
-                         )}
-                        />
+                      {/* Get the definition after rendering the part of speech the word is used. */}
+                      <FlatList
+                        data={item.definitions}
+                        renderItem={({ item }) => (
+                          <Text>{`\u2022`} {item.definition} {`\n`}</Text>
+                        )}
+                      />
 
                     </View>
-                   
+
                   )}
                 />
+
+                <View style={styles.divider}></View>
 
               </View>
 
@@ -1330,27 +1355,62 @@ const styles = StyleSheet.create({
 
   homeScreenTitleContainer: {
 
-    margin: 20,
+    margin: 10,
 
   },
 
   homeScreenTitleText: {
     fontSize: 36,
     fontWeight: 'bold',
-
   },
 
   homeScreenModeButton: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
+    borderRadius: 5,
     padding: 10,
-    marginBottom: 50,
+    marginTop: 10,
+    marginBottom: 10,
+    height: 110,
+
+  },
+
+  homeScreenModeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
+
+  },
+
+  homeScreenModeSubtitle: {
+    fontSize: 16,
+    fontStyle: 'italic',
+  },
+
+  historyListContainer:
+  {
+    backgroundColor: '#a1bbd7',
+    alignItems: 'center',
+  },
+
+  historyListHeaderText:
+  {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
 
   },
 
   wordHistoryContainer:
   {
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 300,
+  },
+
+  wordHistoryHeaderText:
+  {
+    fontSize: 16,
+    fontWeight: 'bold'
   },
 
   wordHistoryButton:
@@ -1366,6 +1426,58 @@ const styles = StyleSheet.create({
   {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+
+  wordDefinitionReturnButton:
+  {
+    margin: 20,
+    backgroundColor: '#6f8fb1',
+    alignSelf: 'center',
+    padding: 15,
+    margin: 20,
+  },
+
+  wordDefinitionReturnButtonText:
+  {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF'
+  },
+
+
+  wordDefinitionContainer:
+  {
+    flex: 1,
+    backgroundColor: '#a1bbd7',
+  },
+
+  wordDefinitionTitleContainer:
+  {
+    backgroundColor: '#475e93',
+    margin: 10,
+    padding: 10,
+  },
+
+  wordDefinitionHeaderText:
+  {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#FFFFFF'
+  },
+
+  wordDefinitionDetailsContainer:
+  {
+    backgroundColor: '#7991c6',
+    margin: 10,
+    padding: 10,
+  },
+
+  divider:
+  {
+    borderBottomColor: 'black',
+    borderBottomWidth: 2,
+    margin: 10,
+    marginBottom: 10,
   },
 
   virtualKeyboardButton: {
@@ -1389,12 +1501,6 @@ const styles = StyleSheet.create({
 
   virtualKeyboardLetter: {
     fontSize: 18,
-    fontWeight: 'bold',
-
-  },
-
-  homeScreenModeText: {
-    fontSize: 24,
     fontWeight: 'bold',
 
   },
