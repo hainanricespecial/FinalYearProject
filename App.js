@@ -1276,13 +1276,11 @@ export default function App() {
 
         <Text style={styles.historyListHeaderText}>Word History</Text>
 
-        <View>
-
-          <FlatList
+        <FlatList
             data={wordHistoryList}
             renderItem={({ item }) => <Word item={item} />}
-          />
-        </View>
+        />
+
 
       </SafeAreaView>
 
@@ -1315,12 +1313,13 @@ export default function App() {
           <Text style={styles.wordDefinitionHeaderText}>{text}</Text>
         </View>
 
-
         {isLoading ? (
           <ActivityIndicator />
         ) : (
 
           <FlatList
+            initialNumToRender={100}
+            maxToRenderPerBatch={100}
             style={styles.wordDefinitionDetailsContainer}
             data={wordDefinition}
             renderItem={({ item }) => (
@@ -1427,6 +1426,7 @@ const styles = StyleSheet.create({
 
   historyListContainer:
   {
+    flex: 1,
     backgroundColor: '#a1bbd7',
     alignItems: 'center',
   },
@@ -1619,7 +1619,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 5,
+    marginTop: 15,
+    marginBottom: 10,
 
   },
 
