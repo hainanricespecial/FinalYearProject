@@ -562,7 +562,7 @@ export default function App() {
 
     return (
 
-      <View style={{ flex: 1, alignItems: 'center', }}>
+      <View style={styles.virtualKeyboardContainer}>
 
         {/* QWERTY row */}
         <View style={{ flexDirection: 'row' }}>
@@ -688,7 +688,7 @@ export default function App() {
         <View style={{ flexDirection: 'row' }}>
 
           <TouchableOpacity onPress={() => { setInputWord(''); }} style={styles.virtualKeyboardFunctionalButton}>
-            <Text style={styles.homeScreenModeText}>CLEAR</Text>
+            <Text style={styles.virtualKeyboardLetter}>CLEAR</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
@@ -719,7 +719,7 @@ export default function App() {
 
 
           }} style={styles.virtualKeyboardFunctionalButton}>
-            <Text style={styles.homeScreenModeText}>ENTER</Text>
+            <Text style={styles.virtualKeyboardLetter}>ENTER</Text>
           </TouchableOpacity>
 
         </View>
@@ -932,7 +932,7 @@ export default function App() {
               <Text style={styles.homeScreenModeText}>Word History</Text>
               <Text style={styles.homeScreenModeSubtitle}>See words you use and learn what they mean.</Text>
             </TouchableOpacity>
-            
+
           </View>
 
 
@@ -951,16 +951,72 @@ export default function App() {
     const navigation = useNavigation();
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.casualGameContainer}>
 
-        <View style={styles.modeTitleContainer}>
-          <Text style={styles.modeTitleText}>Casual Mode</Text>
-          <Text style={styles.modeTitleScore}>{casualScore}</Text>
+        <Text style={styles.modeTitleText}>Casual Mode</Text>
+
+        <View style={styles.casualModeTitleContainer}>
+
           <Button onPress={() => { navigation.navigate('Home') }} title='Return'></Button>
+
+          {/* Reset button. */}
+          <TouchableOpacity onPress={() => {
+            Alert.alert('Warning!', 'Do you wish to reset?', [
+
+              {
+                text: 'Yes',
+                onPress: () => {
+
+                  newGamePreparation();
+
+                }
+              },
+
+              {
+                text: 'No',
+                onPress: () => 
+                {
+
+                }
+              }
+
+            ])
+
+          }}
+            style={styles.casualModeResetButton}>
+            <Text style={styles.casualModeResetButtonText}>Reset</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.modeTitleScore}>{casualScore}</Text>
+
         </View>
 
-        {/* Reset button. */}
-        <Text>Reset</Text>
+        {/* Error text display for the users. */}
+        <View style={styles.casualModeTitleContainer}>
+
+          <Text></Text>
+
+          {usedWordFlag == true &&
+            <Text style={styles.errorText}>You've already used the word! </Text>
+          }
+
+          {nonExistingWordFlag == true &&
+            <Text style={styles.errorText}>That word does not exist in the word list. </Text>
+          }
+
+          {invalidWordFlag == true &&
+            <Text style={styles.errorText}>Wrong first letter! </Text>
+          }
+
+          {emptyTextFlag == true &&
+            <Text style={styles.errorText}>You can't submit an empty text!</Text>
+          }
+
+          <Text></Text>
+
+        </View>
+
+
 
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
@@ -969,29 +1025,11 @@ export default function App() {
 
         </View>
 
-
-        {/* Error text display for the users. */}
-        {usedWordFlag == true &&
-          <Text>You've already used the word! </Text>
-        }
-
-        {nonExistingWordFlag == true &&
-          <Text>That word does not exist in the word list. </Text>
-        }
-
-        {invalidWordFlag == true &&
-          <Text>First letter of the word you've written does not match the prompt's LAST LETTER! </Text>
-        }
-
-        {emptyTextFlag == true &&
-          <Text>You can't submit an empty text!</Text>
-        }
-
         <Text style={styles.modeInputText}>{inputWord}</Text>
 
         {/* Keyboard for users. */}
         {VirtualKeyboard()}
-
+          
         <StatusBar style="auto" />
 
       </SafeAreaView>
@@ -1444,7 +1482,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF'
   },
 
-
   wordDefinitionContainer:
   {
     flex: 1,
@@ -1480,13 +1517,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  virtualKeyboardContainer:
+  {
+    flex: 1, 
+    alignItems: 'center',
+  },
+
   virtualKeyboardButton: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 10,
     margin: 3,
     marginBottom: 30,
-    width: 35,
+    width: 34,
 
   },
 
@@ -1500,9 +1543,65 @@ const styles = StyleSheet.create({
   },
 
   virtualKeyboardLetter: {
-    fontSize: 18,
+
+    fontSize: 15,
     fontWeight: 'bold',
 
+  },
+
+  casualGameContainer:
+  {
+    flex: 1,
+    backgroundColor: '#73c25f',
+    alignItems: 'center',
+  },
+
+  casualModeTitleContainer:
+  {
+    backgroundColor: '#478e35',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: 'center',
+    marginTop: 10,
+    margin: 10,
+    height: 45,
+  },
+
+  casualModeResetButton:
+  {
+    alignItems: 'center',
+    backgroundColor: '#DDDDDD',
+    borderRadius: 5,
+    padding: 10,
+
+  },
+
+  casualModeResetButtonText:
+  {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+
+  errorText:
+  {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  gameplayContainer:
+  {
+    margin: 35,
+    backgroundColor: '#fff',
+  },
+
+  wordPrompt: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    backgroundColor: 'green',
+    width: 300,
+    textAlign: 'center',
+    padding: 15,
   },
 
   modeTitleContainer:
@@ -1520,7 +1619,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    margin: 10,
+    marginTop: 5,
 
   },
 
@@ -1528,8 +1627,8 @@ const styles = StyleSheet.create({
   {
     height: 60,
     width: 300,
-    margin: 40,
-    borderWidth: 1,
+    margin: 20,
+    borderWidth: 2,
     padding: 10,
     textAlign: 'center',
     fontSize: 24,
@@ -1544,18 +1643,6 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 
-  gameplayContainer: {
-    margin: 30,
-    backgroundColor: '#fff',
 
-  },
 
-  wordPrompt: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    backgroundColor: 'green',
-    width: 300,
-    textAlign: 'center',
-    padding: 15,
-  },
 });
