@@ -729,6 +729,17 @@ export default function App() {
     )
   }
 
+  // Function to display the lives for score mode.
+  function scoreLifeDisplay()
+  {
+    return (
+      <View>
+        <Text>Chances left: {lives}</Text>
+      </View>
+      
+    )
+  }
+
   // Function to fetch the definition of words via Dictionary API
   const fetchWordDefinition = async (word) => {
 
@@ -750,6 +761,7 @@ export default function App() {
     }
 
   }
+
 
   // Screen for home screen.
   function HomeScreen() {
@@ -848,7 +860,7 @@ export default function App() {
           </View>
 
           {/* Button to redirect to the challenge mode of the game. */}
-          <View style={{ backgroundColor: '#ccc', padding: 5, marginBottom: 5 }}>
+          <View style={{ backgroundColor: '#ca6049', padding: 5, marginBottom: 5 }}>
 
             <TouchableOpacity onPress={() => {
 
@@ -1097,7 +1109,7 @@ export default function App() {
         </View>
 
         {/* Life display. */}
-        <Text>Chances left: {lives}</Text>
+        {scoreLifeDisplay()}
 
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
