@@ -730,13 +730,64 @@ export default function App() {
   }
 
   // Function to display the lives for score mode.
-  function scoreLifeDisplay()
+  function scoreLifeDisplay() {
+    return (
+      <View>
+        {lives == 5 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}{`\u2665`}{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {lives == 4 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {lives == 3 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {lives == 2 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {lives == 1 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}</Text>
+        }
+
+        {lives == 0 &&
+          <Text style={styles.lifeDisplay}></Text>
+        }
+
+
+      </View>
+
+    )
+  }
+
+  // Function to display the lives for challenge mode.
+  function challengeLifeDisplay()
   {
     return (
       <View>
-        <Text>Chances left: {lives}</Text>
+
+        {challengeLives == 3 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {challengeLives == 2 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}{`\u2665`}</Text>
+        }
+
+        {challengeLives == 1 &&
+          <Text style={styles.lifeDisplay}>{`\u2665`}</Text>
+        }
+
+        {challengeLives == 0 &&
+          <Text style={styles.lifeDisplay}></Text>
+        }
+
+
       </View>
-      
+
     )
   }
 
@@ -1186,6 +1237,9 @@ export default function App() {
 
         </View>
 
+        {/* Life display. */}
+        {challengeLifeDisplay()}
+
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
 
@@ -1193,8 +1247,6 @@ export default function App() {
           <Text style={styles.challengeModeWordLengthPrompt}>YOUR MINIMUM LENGTH IS: {minimumLength} </Text>
 
         </View>
-
-        <Text>Chances left: {challengeLives}</Text>
 
         <Text style={styles.modeInputText}>{inputWord}</Text>
 
@@ -1739,6 +1791,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  lifeDisplay:
+  {
+    fontSize: 24,
+    fontWeight: 'bold',
+    backgroundColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
 
   errorText:
   {
