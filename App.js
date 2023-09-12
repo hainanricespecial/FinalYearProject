@@ -767,7 +767,8 @@ export default function App() {
           </View>
 
           {/* Button to redirect to the casual mode of the game. */}
-          <View style={{ backgroundColor: '#b4b4b4', padding: 5, marginBottom: 5 }}>
+          <View style={{ backgroundColor: '#73c25f', padding: 5, marginBottom: 5 }}>
+
             <TouchableOpacity onPress={() => {
               //Set the current game mode.
               setCurrentGameMode('Casual');
@@ -780,13 +781,15 @@ export default function App() {
 
             }}
               style={styles.homeScreenModeButton}>
+
               <Text style={styles.homeScreenModeText}>Casual Mode</Text>
               <Text style={styles.homeScreenModeSubtitle}>Practice your word chains! Reset to your liking.</Text>
             </TouchableOpacity>
+
           </View>
 
           {/* Button to redirect to the score mode of the game. */}
-          <View style={{ backgroundColor: '#1f1f1f', padding: 5, marginBottom: 5 }}>
+          <View style={{ backgroundColor: '#b2c631', padding: 5, marginBottom: 5 }}>
 
             <TouchableOpacity onPress={() => {
 
@@ -951,40 +954,18 @@ export default function App() {
     const navigation = useNavigation();
 
     return (
-      <SafeAreaView style={styles.casualGameContainer}>
+      <SafeAreaView style={styles.casualModeGameContainer}>
 
         <Text style={styles.modeTitleText}>Casual Mode</Text>
 
         <View style={styles.casualModeTitleContainer}>
 
-          <Button onPress={() => { navigation.navigate('Home') }} title='Return'></Button>
-
-          {/* Reset button. */}
+          {/* Return button. */}
           <TouchableOpacity onPress={() => {
-            Alert.alert('Warning!', 'Do you wish to reset?', [
-
-              {
-                text: 'Yes',
-                onPress: () => {
-
-                  newGamePreparation();
-
-                }
-              },
-
-              {
-                text: 'No',
-                onPress: () => 
-                {
-
-                }
-              }
-
-            ])
-
+            navigation.navigate('Home')
           }}
-            style={styles.casualModeResetButton}>
-            <Text style={styles.casualModeResetButtonText}>Reset</Text>
+            style={styles.casualModeReturnButton}>
+            <Text style={styles.casualModeReturnButtonText}>Return</Text>
           </TouchableOpacity>
 
           <Text style={styles.modeTitleScore}>{casualScore}</Text>
@@ -1016,12 +997,38 @@ export default function App() {
 
         </View>
 
+        {/* Reset button. */}
+        <TouchableOpacity onPress={() => {
+          Alert.alert('Warning!', 'Do you wish to reset?', [
 
+            {
+              text: 'Yes',
+              onPress: () => {
+
+                setInputWord('');
+                newGamePreparation();
+
+              }
+            },
+
+            {
+              text: 'No',
+              onPress: () => {
+
+              }
+            }
+
+          ])
+
+        }}
+          style={styles.casualModeResetButton}>
+          <Text style={styles.casualModeResetButtonText}>Reset</Text>
+        </TouchableOpacity>
 
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
 
-          <Text style={styles.wordPrompt}>{casualWord}</Text>
+          <Text style={styles.casualWordPrompt}>{casualWord}</Text>
 
         </View>
 
@@ -1029,7 +1036,7 @@ export default function App() {
 
         {/* Keyboard for users. */}
         {VirtualKeyboard()}
-          
+
         <StatusBar style="auto" />
 
       </SafeAreaView>
@@ -1043,39 +1050,62 @@ export default function App() {
     const navigation = useNavigation();
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.scoreModeGameContainer}>
 
-        <View style={styles.modeTitleContainer}>
-          <Text style={styles.modeTitleText}>Score Mode</Text>
+        <Text style={styles.modeTitleText}>Score Mode</Text>
+
+        <View style={styles.scoreModeTitleContainer}>
+
+
+          {/* Return button. */}
+          <TouchableOpacity onPress={() => {
+            navigation.navigate('Home')
+          }}
+            style={styles.casualModeReturnButton}>
+            <Text style={styles.casualModeReturnButtonText}>Return</Text>
+          </TouchableOpacity>
+
           <Text style={styles.modeTitleScore}>{score}</Text>
-          <Button onPress={() => { navigation.navigate('Home') }} title='Return'></Button>
+
+
         </View>
+
+        {/* Error text display for the users. */}
+        <View style={styles.scoreModeTitleContainer}>
+
+          <Text></Text>
+
+
+          {usedWordFlag == true &&
+            <Text style={styles.errorText}>You've already used the word! </Text>
+          }
+
+          {nonExistingWordFlag == true &&
+            <Text style={styles.errorText}>That word does not exist in the word list. </Text>
+          }
+
+          {invalidWordFlag == true &&
+            <Text style={styles.errorText}>Wrong first letter! </Text>
+          }
+
+          {emptyTextFlag == true &&
+            <Text style={styles.errorText}>You can't submit an empty text!</Text>
+          }
+
+          <Text></Text>
+
+        </View>
+
+        {/* Life display. */}
+        <Text>Chances left: {lives}</Text>
 
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
 
-          <Text style={styles.wordPrompt}>{scoreModeWord}</Text>
+          <Text style={styles.scoreModeWordPrompt}>{scoreModeWord}</Text>
 
         </View>
 
-        <Text>Chances left: {lives}</Text>
-
-        {/* Error text display for the users. */}
-        {usedWordFlag == true &&
-          <Text>You've already used the word! </Text>
-        }
-
-        {nonExistingWordFlag == true &&
-          <Text>That word does not exist in the word list. </Text>
-        }
-
-        {invalidWordFlag == true &&
-          <Text>First letter of the word you've written does not match the prompt's LAST LETTER! </Text>
-        }
-
-        {emptyTextFlag == true &&
-          <Text>You can't submit an empty text!</Text>
-        }
 
         <Text style={styles.modeInputText}>{inputWord}</Text>
 
@@ -1095,45 +1125,64 @@ export default function App() {
     const navigation = useNavigation();
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.challengeModeGameContainer}>
 
-        <View style={styles.modeTitleContainer}>
-          <Text style={styles.modeTitleText}>Challenge Mode</Text>
+        <Text style={styles.modeTitleText}>Challenge Mode</Text>
+
+        <View style={styles.challengeModeTitleContainer}>
+
+          {/* Return button. */}
+          <TouchableOpacity onPress={() => {
+            navigation.navigate('Home')
+          }}
+            style={styles.casualModeReturnButton}>
+            <Text style={styles.casualModeReturnButtonText}>Return</Text>
+          </TouchableOpacity>
+
           <Text style={styles.modeTitleScore}>{challengeScore}</Text>
-          <Button onPress={() => { navigation.navigate('Home') }} title='Return'></Button>
+
+
+        </View>
+
+        {/* Error text display for the users. */}
+        <View style={styles.challengeModeTitleContainer}>
+
+          <Text></Text>
+
+
+          {usedWordFlag == true &&
+            <Text style={styles.errorText}>You've already used the word! </Text>
+          }
+
+          {nonExistingWordFlag == true &&
+            <Text style={styles.errorText}>That word does not exist in the word list. </Text>
+          }
+
+          {invalidWordFlag == true &&
+            <Text style={styles.errorText}>Wrong first letter! </Text>
+          }
+
+          {emptyTextFlag == true &&
+            <Text style={styles.errorText}>You can't submit an empty text!</Text>
+          }
+
+          {textTooShortFlag == true &&
+            <Text style={styles.errorText}>Your text is too short!</Text>
+          }
+
+          <Text></Text>
+
         </View>
 
         {/* Prompt text display. */}
         <View style={styles.gameplayContainer}>
 
-          <Text style={styles.wordPrompt}>{challengeModeWord}</Text>
-          <Text>YOUR MINIMUM LENGTH IS: {minimumLength} </Text>
+          <Text style={styles.challengeModeWordPrompt}>{challengeModeWord}</Text>
+          <Text style={styles.challengeModeWordLengthPrompt}>YOUR MINIMUM LENGTH IS: {minimumLength} </Text>
 
         </View>
 
         <Text>Chances left: {challengeLives}</Text>
-
-        {/* Error text display for the users. */}
-        {usedWordFlag == true &&
-          <Text>You've already used the word! </Text>
-        }
-
-        {nonExistingWordFlag == true &&
-          <Text>That word does not exist in the word list. </Text>
-        }
-
-        {invalidWordFlag == true &&
-          <Text>First letter of the word you've written does not match the prompt's LAST LETTER! </Text>
-        }
-
-        {emptyTextFlag == true &&
-          <Text>You can't submit an empty text!</Text>
-        }
-
-        {textTooShortFlag == true &&
-          <Text>Your text is too short!</Text>
-        }
-
 
         <Text style={styles.modeInputText}>{inputWord}</Text>
 
@@ -1277,8 +1326,8 @@ export default function App() {
         <Text style={styles.historyListHeaderText}>Word History</Text>
 
         <FlatList
-            data={wordHistoryList}
-            renderItem={({ item }) => <Word item={item} />}
+          data={wordHistoryList}
+          renderItem={({ item }) => <Word item={item} />}
         />
 
 
@@ -1519,7 +1568,7 @@ const styles = StyleSheet.create({
 
   virtualKeyboardContainer:
   {
-    flex: 1, 
+    flex: 1,
     alignItems: 'center',
   },
 
@@ -1549,7 +1598,7 @@ const styles = StyleSheet.create({
 
   },
 
-  casualGameContainer:
+  casualModeGameContainer:
   {
     flex: 1,
     backgroundColor: '#73c25f',
@@ -1565,7 +1614,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     margin: 10,
-    height: 45,
+    height: 55,
   },
 
   casualModeResetButton:
@@ -1574,14 +1623,110 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDDDDD',
     borderRadius: 5,
     padding: 10,
+    margin: 5,
 
+  },
+
+  casualModeReturnButton:
+  {
+    alignItems: 'center',
+    borderRadius: 5,
+    padding: 10,
+    margin: 5,
+
+  },
+
+  casualModeReturnButtonText:
+  {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff'
   },
 
   casualModeResetButtonText:
   {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
   },
+
+  casualWordPrompt: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    backgroundColor: 'green',
+    width: 300,
+    textAlign: 'center',
+    padding: 15,
+    color: 'white',
+  },
+
+  scoreModeGameContainer:
+  {
+    flex: 1,
+    backgroundColor: '#b2c631',
+    alignItems: 'center',
+  },
+
+  scoreModeTitleContainer:
+  {
+    backgroundColor: '#919f34',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: 'center',
+    marginTop: 10,
+    margin: 10,
+    height: 55,
+  },
+
+  scoreModeWordPrompt: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    backgroundColor: '#6c733e',
+    width: 300,
+    textAlign: 'center',
+    padding: 15,
+    color: 'white',
+  },
+
+  challengeModeGameContainer:
+  {
+    flex: 1,
+    backgroundColor: '#ca6049',
+    alignItems: 'center',
+  },
+
+  challengeModeTitleContainer:
+  {
+    backgroundColor: '#9f3923',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: 'center',
+    marginTop: 10,
+    margin: 10,
+    height: 55,
+  },
+
+  challengeModeWordPrompt:
+  {
+    fontSize: 30,
+    fontWeight: 'bold',
+    backgroundColor: '#8c1f08',
+    width: 300,
+    textAlign: 'center',
+    padding: 15,
+    color: 'white',
+    marginBottom: 10,
+  },
+
+  challengeModeWordLengthPrompt:
+  {
+    marginTop: 5,
+    padding: 3,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
 
   errorText:
   {
@@ -1591,18 +1736,9 @@ const styles = StyleSheet.create({
 
   gameplayContainer:
   {
-    margin: 35,
-    backgroundColor: '#fff',
+    margin: 25,
   },
 
-  wordPrompt: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    backgroundColor: 'green',
-    width: 300,
-    textAlign: 'center',
-    padding: 15,
-  },
 
   modeTitleContainer:
   {
@@ -1634,6 +1770,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'white',
+    backgroundColor: '#5b5d52'
   },
 
   modeTitleScore:
