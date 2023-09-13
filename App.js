@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, Button, TouchableOpacity, Alert, FlatList, ScrollView, SectionList, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, TouchableOpacity, Alert, FlatList, Pressable } from 'react-native';
 import React, { useState, setState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
@@ -149,7 +149,6 @@ export default function App() {
   // Save the word history list into the AsyncStorage.
   const storeWordHistoryList = async (value) => {
     try {
-      console.log(value);
       const JSONList = JSON.stringify(value);
       await AsyncStorage.setItem('wordHistoryList', JSONList);
     }
@@ -297,7 +296,7 @@ export default function App() {
 
         {/* Check if the word has been used already. */ }
         {/* If not, the word is a valid word. */ }
-        if (wordListCheck.some((wordUsedListWords) => wordUsedListWords.word.includes(input_word.toLowerCase()))) {
+        if (wordListCheck.some((wordUsedListWords) => wordUsedListWords.word.includes(`input_word.toLowerCase()`))) {
 
           {/* Set the error flag for the used word warning. */ }
           setUsedWordFlag(true);
@@ -764,8 +763,7 @@ export default function App() {
   }
 
   // Function to display the lives for challenge mode.
-  function challengeLifeDisplay()
-  {
+  function challengeLifeDisplay() {
     return (
       <View>
 
@@ -812,7 +810,6 @@ export default function App() {
     }
 
   }
-
 
   // Screen for home screen.
   function HomeScreen() {
@@ -979,7 +976,10 @@ export default function App() {
           {/* Button to redirect to the game instruction screen. */}
           <View style={{ backgroundColor: '#bbb', padding: 5, marginBottom: 5 }}>
 
-            <TouchableOpacity onPress={() => alert('Coming soon!')} style={styles.homeScreenModeButton}>
+            <TouchableOpacity onPress={() => {
+              navigation.navigate("HowToPlay");
+            }}
+              style={styles.homeScreenModeButton}>
               <Text style={styles.homeScreenModeText}>How to Play</Text>
               <Text style={styles.homeScreenModeSubtitle}>Learn how to play the game!</Text>
             </TouchableOpacity>
@@ -1261,16 +1261,127 @@ export default function App() {
 
   }
 
+  // Screen for how to play screen.
+  function HowToPlayScreen() {
+
+    const navigation = useNavigation();
+
+    return (
+      <SafeAreaView style={styles.howToPlayContainer}>
+
+        <View style={styles.howToPlayFirstSection}>
+
+          <Text style={styles.howToPlayTitleText}>How To Play</Text>
+
+        </View>
+
+        <View style={styles.howToPlaySecondSection}>
+
+          <Text style={styles.howToPlayText}>
+            To play the game, you need to find the word that starts with 
+            the last letter of the prompt!
+          </Text>
+
+          <Text></Text>
+
+          <Text style={styles.howToPlayText}>
+              For example:
+          </Text>
+
+          <Text></Text>
+
+          <Text style={styles.howToPlayText}>
+              {`elephant -> tea -> apple -> ...and so on!`}
+          </Text>
+
+          <Text></Text>
+
+          <Text style={styles.howToPlayText}>
+            Note that you can only use words ONCE during a game and 
+            you can't reuse it again.
+          </Text>
+
+        </View>
+
+        <View style={styles.howToPlayThirdSection}>
+
+          <Text style={styles.howToPlayText}>
+            To get used to the game, try Casual Mode!
+          </Text>
+
+          <Text></Text>
+
+          <Text style={styles.howToPlayText}>
+            If you are feeling stuck or wish to retry, press the 
+            reset button!
+          </Text>
+
+        </View>
+
+        <View style={styles.howToPlayFourthSection}>
+
+          <Text style={styles.howToPlayText}>
+              There are two modes in the game, Score and Challenge.
+          </Text>
+
+        </View>
+
+        <View style={styles.howToPlayFifthSection}>
+
+          <Text style={styles.howToPlayText}>
+              In Score Mode, you only have 5 chances to make a mistake before
+              the game is over. 
+          </Text>
+
+        </View>
+
+        <View style={styles.howToPlaySixthSection}>
+
+          <Text style={styles.howToPlayText}>
+              In Challenge Mode, you only have 3 chances to make a mistake before
+              the game is over. 
+          </Text>
+
+          <Text></Text>
+
+          <Text style={styles.howToPlayText}>
+              Not just that, you need to make the word to be of minimum 
+              length, which can be seen in under the word prompt! 
+          </Text>
+
+          <Text style={styles.howToPlayText}>
+              Be careful as to not make a word too short, otherwise
+              you will lose one chance.
+          </Text>
+
+          <Text></Text>
+
+        </View>
+
+          {/* Return button. */}
+          <TouchableOpacity onPress={() => {
+            navigation.navigate('Home')
+          }}
+            style={styles.gameOverReturnButton}>
+            <Text style={styles.casualModeReturnButtonText}>Return</Text>
+          </TouchableOpacity>
+
+      </SafeAreaView>
+    )
+  }
+
   // Screen for game over.
   function GameOverScreen() {
 
     // Create a navigation hook.
     const navigation = useNavigation();
 
-    // Create variables for scores and highscores
+    // Create variables for scores and highscores and wordlist
     var displayScoreResults;
     var displayHighScoreResults;
+    var wordListResults;
 
+    // Reset the flag for checking if a game is currently in progress.
     useEffect(() => {
 
       switch (currentGameMode) {
@@ -1285,18 +1396,19 @@ export default function App() {
 
     }, []);
 
-    // Get the scores of a specific game mode.
+    // Get the scores and word list of a specific game mode.
     switch (currentGameMode) {
       case 'Score':
         displayScoreResults = score;
         displayHighScoreResults = highScore;
+        wordListResults = scoreWordUsedList;
         break;
 
       case 'Challenge':
         displayScoreResults = challengeScore;
         displayHighScoreResults = challengeHighScore;
+        wordListResults = challengeWordUsedList;
         break;
-
 
     }
 
@@ -1323,21 +1435,30 @@ export default function App() {
     }, [])
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.gameOverContainer}>
 
-        <View>
-          <Text>Game over!</Text>
-          <Text>Score: {displayScoreResults}</Text>
-          <Text>High Score: {displayHighScoreResults}</Text>
+        <View style={styles.gameOverDetailContainer}>
 
-          {/* Button to go back to the home page. */}
-          <Button onPress={() => {
+          <Text style={styles.gameOverTitleText}>GAME OVER</Text>
+          <Text style={styles.gameOverScoreText}>Score: {displayScoreResults}</Text>
+          <Text style={styles.gameOverScoreText}>High Score: {displayHighScoreResults}</Text>
 
+          <Text style={styles.gameOverScoreText}>Word that you have used:</Text>
+
+          <FlatList
+            data={wordListResults}
+            renderItem={({ item }) => <Text style={styles.gameOverWordUsedText}>{`\u2022`} {item.word}</Text>}
+          />
+
+          {/* Return button. */}
+          <TouchableOpacity onPress={() => {
             newGamePreparation();
+            navigation.navigate('Home')
+          }}
+            style={styles.gameOverReturnButton}>
+            <Text style={styles.casualModeReturnButtonText}>Return</Text>
+          </TouchableOpacity>
 
-            navigation.navigate('Home');
-
-          }} title='Return'></Button>
         </View>
 
       </SafeAreaView>
@@ -1488,6 +1609,7 @@ export default function App() {
         <Stack.Screen name="GameOver" component={GameOverScreen} />
         <Stack.Screen name="WordHistory" component={WordHistoryScreen} />
         <Stack.Screen name="WordDefinition" component={WordDefinitionScreen} />
+        <Stack.Screen name="HowToPlay" component={HowToPlayScreen} />
       </Stack.Navigator>
     </NavigationContainer>
 
@@ -1791,6 +1913,117 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  gameOverContainer:
+  {
+    flex: 1,
+    backgroundColor: '#2c85cb',
+    alignItems: 'center',
+    padding: 30
+  },
+
+  gameOverDetailContainer:
+  {
+    margin: 50,
+  },
+
+  gameOverTitleText:
+  {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+
+  gameOverScoreText:
+  {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 20,
+  },
+
+  gameOverWordUsedText:
+  {
+    fontSize: 18,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+
+  gameOverReturnButton:
+  {
+    alignItems: 'center',
+    borderRadius: 5,
+    padding: 10,
+    margin: 5,
+    borderWidth: 2,
+    backgroundColor: '#3072a5'
+  },
+
+  howToPlayContainer:
+  {
+    backgroundColor: '#bbbbbb',
+    flex: 1,
+  },
+
+  howToPlayTitleText:
+  {
+    fontSize: 28,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
+  howToPlayText:
+  {
+    fontSize: 15,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+
+  howToPlayFirstSection:
+  {
+    backgroundColor: '#a356d8',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+  howToPlaySecondSection:
+  {
+    backgroundColor: '#974fc8',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+  howToPlayThirdSection:
+  {
+    backgroundColor: '#803dae',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+  howToPlayFourthSection:
+  {
+    backgroundColor: '#6e2f99',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+  howToPlayFifthSection:
+  {
+    backgroundColor: '#5c2383',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+  howToPlaySixthSection:
+  {
+    backgroundColor: '#4b196e',
+    padding: 10,
+    marginBottom: 3,
+  },
+
+
   lifeDisplay:
   {
     fontSize: 24,
@@ -1811,7 +2044,6 @@ const styles = StyleSheet.create({
   {
     margin: 25,
   },
-
 
   modeTitleContainer:
   {
