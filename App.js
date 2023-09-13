@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, TouchableOpacity, Alert, FlatList, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, TouchableOpacity, Alert, FlatList, Pressable, Image } from 'react-native';
 import React, { useState, setState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
@@ -10,6 +10,8 @@ import wordList from './assets/json/wordlist.json';
 
 import correctSFX from './assets/sfx/short03b.wav';
 import wrongSFX from './assets/sfx/short02c.wav';
+
+import logo from './assets/image/logo.png';
 
 export default function App() {
 
@@ -822,8 +824,8 @@ export default function App() {
 
         <View>
 
-          <View style={styles.homeScreenTitleContainer}>
-            <Text style={styles.homeScreenTitleText}>Connected by Letters</Text>
+          <View>
+            <Image style={{alignSelf: 'center'}} source={logo}></Image>
           </View>
 
           {/* Button to redirect to the casual mode of the game. */}
@@ -1622,12 +1624,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-
-  },
-
-  homeScreenTitleContainer: {
-
-    margin: 10,
 
   },
 
