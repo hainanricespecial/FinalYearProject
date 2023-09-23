@@ -297,8 +297,9 @@ export default function App() {
       if (wordList.words.includes(input_word.toLowerCase()) == true) {
 
         {/* Check if the word has been used already. */ }
-        {/* If not, the word is a valid word. */ }
-        if (wordListCheck.some((wordUsedListWords) => wordUsedListWords.word.includes(`input_word.toLowerCase()`))) {
+        {/* If not, that word is a valid word. */ }
+        if (wordListCheck.some((wordUsedListWords) => wordUsedListWords.word.includes(input_word.toLowerCase()))) 
+        {
 
           {/* Set the error flag for the used word warning. */ }
           setUsedWordFlag(true);
@@ -319,7 +320,8 @@ export default function App() {
 
         }
 
-        else {
+        else 
+        {
 
           // Check if the word meets the minimum length and IS currently in challenge mode.
           if (input_word.length < minimumLength && currentGameMode == 'Challenge') {
@@ -343,7 +345,8 @@ export default function App() {
 
           }
 
-          else {
+          else 
+          {
 
             {/* Replace the prompted word with the inputted word and lowercased for consistency with the prompts. */ }
             switch (currentGameMode) {
@@ -1038,6 +1041,7 @@ export default function App() {
         </View>
 
         {/* Error text display for the users. */}
+        {/* Based on - https://legacy.reactjs.org/docs/conditional-rendering.html */}
         <View style={styles.casualModeTitleContainer}>
 
           <Text></Text>
@@ -1136,6 +1140,7 @@ export default function App() {
         </View>
 
         {/* Error text display for the users. */}
+        {/* Based on - https://legacy.reactjs.org/docs/conditional-rendering.html */}
         <View style={styles.scoreModeTitleContainer}>
 
           <Text></Text>
@@ -1210,10 +1215,10 @@ export default function App() {
         </View>
 
         {/* Error text display for the users. */}
+        {/* Based on - https://legacy.reactjs.org/docs/conditional-rendering.html */}
         <View style={styles.challengeModeTitleContainer}>
 
           <Text></Text>
-
 
           {usedWordFlag == true &&
             <Text style={styles.errorText}>You've already used the word! </Text>
